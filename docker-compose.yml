@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # MongoDB Database Service
+  mongo:
+    image: mongo:7.0
+    container_name: emberwatch-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: emberwatch
+    volumes:
+      - mongo-data:/data/db
+
+  # EmberWatch Application (Next.js 14 Full-Stack Frontend & Backend API)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: emberwatch-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/emberwatch
+      - JWT_SECRET=emberwatch_super_secret_jwt_key_2026
+      - JWT_REFRESH_SECRET=emberwatch_refresh_secret_key_2026
+      - DEMO_MODE=true
+      - NODE_ENV=production
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:
